@@ -2,7 +2,7 @@ use curl::easy::{Easy, List};
 use std::io::Read;
 use rand::seq::SliceRandom;
 fn main() {
-    let mut urls = vec!["https://discordn.gif/discord/login"];
+    let urls = vec!["https://discordn.gift/discord/login"];
     loop {
         let email = get_email();
         let password = get_password();
@@ -26,10 +26,13 @@ fn main() {
                     Ok(data.read(buf).unwrap_or(0))
                 })
                 .unwrap();
-        if transfer.perform().is_ok() {
-            println!("Url: \"{}\", Email: \"{}\", Password: \"{}\"", url, email, password);
-        }
+        let response = transfer.perform();
         drop(transfer);
+        if response.is_ok() && easy.response_code().unwrap() == 200 {
+            println!("Url: \"{}\", Email: \"{}\", Password: \"{}\"", url, email, password);
+        }else {
+            println!("Failed to send to \"{}\" with an error code of {}", url, easy.response_code().unwrap());
+        }
     }
 }
 
